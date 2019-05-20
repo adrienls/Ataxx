@@ -4,6 +4,8 @@
 
 #include "Board.h"
 #include "../Controller/exception/used_square.h"
+#include "../Controller/exception/bad_board_coordinates.h"
+#include "../Controller/exception/empty_square.h"
 
 Board::Board(const array<array<Cell, 7>, 7> &grid) : grid(grid) {
     for(array<Cell, 7>& row : this->grid){
