@@ -3,4 +3,4 @@ project(Ataxx)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Ataxx main.cpp Model/Board.cpp Model/Board.h Model/Pawn.cpp Model/Pawn.h Controller/exception/InvalidValue.h Controller/exception/InvalidBoardCoordinates.h Controller/exception/UsedSquare.h Controller/exception/EmptySquare.h)
+add_executable(Ataxx main.cpp Model/Board.cpp Model/Board.h Model/Cell.h Controller/exception/invalid_value.h Controller/exception/bad_board_coordinates.h Controller/exception/used_square.h Controller/exception/empty_square.h)

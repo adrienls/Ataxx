@@ -3,65 +3,59 @@
 //
 
 #include "Board.h"
-#include "../Controller/exception/UsedSquare.h"
-#include "../Controller/exception/EmptySquare.h"
+#include "../Controller/exception/used_square.h"
 
-Board::Board(const array<array<Pawn *, 7>, 7> &grid) : grid(grid), nbRedPawn(2), nbBluePawn(2) {
-    for(array<Pawn*, 7> row : this->grid){
-        for(Pawn* pawn : row){
-            pawn = nullptr;
+Board::Board(const array<array<Cell, 7>, 7> &grid) : grid(grid) {
+    for(array<Cell, 7>& row : this->grid){
+        for(Cell& pawn : row){
+            pawn = empty;
         }
     }
-    this->grid[0][0] = new Pawn(Red, 0, 0);
-    this->grid[0][6] = new Pawn(Blue, 0, 6);
-    this->grid[6][0] = new Pawn(Blue, 0, 6);
-    this->grid[6][6] = new Pawn(Red, 6, 6);
+    this->grid[0][0] = Red;
+    this->grid[0][6] = Blue;
+    this->grid[6][0] = Blue;
+    this->grid[6][6] = Red;
 }
-Board::~Board() {
-    for(array<Pawn*, 7> row : this->grid){
-        for(Pawn* pawn : row){
-            delete pawn;
-        }
+
+void Board::coordinatesValidation(unsigned char row, unsigned char column) {
+    if(row > 6){
+        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): row too big", row);
+    }
+    if(row < 0){
+        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): row too small", row);
+    }
+    if(column > 6){
+        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): column too big", column);
+    }
+    if(column < 0){
+        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): column too small", column);
     }
 }
 
-const array<array<Pawn *, 7>, 7> &Board::getGrid() const {
-    return grid;
-}
-void Board::setGrid(const array<array<Pawn *, 7>, 7> &grid) {
-    Board::grid = grid;
+void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
+    Board::coordinatesValidation(row, column);
+    Cell& currentPawn = this->grid[row][column];
+    if(currentPawn != empty){
+        throw used_square<Cell>("addPawn()", currentPawn);
+    }
+    currentPawn = newPawn;
+    (newPawn == Red)? this->nbRedPawn++ : this->nbBluePawn++;
+    //increment the number of colored pawn depending of the color of the newly added newPawn
 }
 
-void Board::addPawn(Pawn *pawn) {
-    unsigned char row = pawn->getRow();
-    unsigned char column = pawn->getColumn();
-    if(this->grid[row][column] == nullptr){
-        this->grid[row][column] = pawn;
-        (pawn->getColor() == Red)? this->nbRedPawn++ : this->nbBluePawn++;
-        //increment the number of colored pawn depending of the color of the newly added pawn
-    }
-    else{
-        throw UsedSquare<Pawn*>("addPawn()", this->grid[row][column]);
-    }
-}
 void Board::changeColor(unsigned char row, unsigned char column) {
-    Pawn* currentPawn = this->grid[row][column];
-    if(currentPawn != nullptr){
-        Color newColor = (currentPawn->getColor() == Red)? Blue : Red;
-        currentPawn->setColor(newColor);
-        if(newColor == Red){
-            this->nbRedPawn++;
-            this->nbBluePawn--;
-        }
-        else{
-            this->nbRedPawn--;
-            this->nbBluePawn++;
-        }
+    Board::coordinatesValidation(row, column);
+    Cell& currentPawn = this->grid[row][column];
+    if(currentPawn == empty){
+        throw empty_square<Cell>("changeColor()", currentPawn);
+    }
+    currentPawn = (currentPawn == Red)? Blue : Red;
+    if(currentPawn == Red){
+        this->nbRedPawn++;
+        this->nbBluePawn--;
     }
     else{
-        throw EmptySquare<Pawn*>("changeColor()", currentPawn);
+        this->nbRedPawn--;
+        this->nbBluePawn++;
     }
-}
-void Board::changeColor(array<unsigned char, 2> position) {
-    Board::changeColor(position[0], position[1]);
 }
