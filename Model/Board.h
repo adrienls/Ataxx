@@ -17,29 +17,23 @@ private:
     unsigned char nbBluePawn = 2;
     static void coordinatesValidation(unsigned char row, unsigned char column);
 public:
-    Board(const array<array<Cell, 7>, 7> &grid);
+    Board() noexcept;
     virtual ~Board() = default;
 
-    unsigned char getNbRedPawn() const {return nbRedPawn;}
-    unsigned char getNbBluePawn() const {return nbBluePawn;}
+    inline unsigned char getNbRedPawn() const noexcept;
+    inline unsigned char getNbBluePawn() const noexcept;
 
-    const Cell getPawn(unsigned char row, unsigned char column) const {
-        Board::coordinatesValidation(row, column);
-        return this->grid[row][column];
-    }
-    const Cell getPawn(array<unsigned char, 2> position) const {
-        return getPawn(position[0], position[1]);
-    }
+    inline const Cell getPawn(unsigned char row, unsigned char column) const;
+    inline const Cell getPawn(array<unsigned char, 2> position) const;
 
     void addPawn(Cell newPawn, unsigned char row, unsigned char column);
-    void addPawn(Cell pawn, array<unsigned char, 2> position){
-        Board::addPawn(pawn, position[0], position[1]);
-    }
+    inline void addPawn(Cell pawn, array<unsigned char, 2> position);
 
     void changeColor(unsigned char row, unsigned char column);
-    void changeColor(array<unsigned char, 2> position){
-        changeColor(position[0], position[1]);
-    }
+    inline void changeColor(array<unsigned char, 2> position);
+
+    void movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn);
+    inline void movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination);
 };
 
 #endif //ATAXX_BOARD_H

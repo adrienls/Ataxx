@@ -11,7 +11,8 @@ template <typename Error>
 class empty_square : invalid_value<Error>{
 public:
     empty_square() = delete;
-    empty_square(const string &functionName, Error value) :
+    empty_square(const empty_square& e) noexcept : empty_square(e.functionName, e.value) {}
+    empty_square(const string &functionName, Error value) noexcept :
     invalid_value<Error>(functionName, value, "Empty board square, no modification is possible.") {}
     virtual ~empty_square() = default;
 };

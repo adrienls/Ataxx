@@ -7,7 +7,7 @@
 #include "../Controller/exception/bad_board_coordinates.h"
 #include "../Controller/exception/empty_square.h"
 
-Board::Board(const array<array<Cell, 7>, 7> &grid) : grid(grid) {
+Board::Board() noexcept {
     for(array<Cell, 7>& row : this->grid){
         for(Cell& pawn : row){
             pawn = empty;
@@ -34,6 +34,21 @@ void Board::coordinatesValidation(unsigned char row, unsigned char column) {
     }
 }
 
+unsigned char Board::getNbRedPawn() const noexcept {
+    return nbRedPawn;
+}
+unsigned char Board::getNbBluePawn() const noexcept {
+    return nbBluePawn;
+}
+
+const Cell Board::getPawn(unsigned char row, unsigned char column) const {
+    Board::coordinatesValidation(row, column);
+    return this->grid[row][column];
+}
+const Cell Board::getPawn(array<unsigned char, 2> position) const {
+    return getPawn(position[0], position[1]);
+}
+
 void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
     Board::coordinatesValidation(row, column);
     Cell& currentPawn = this->grid[row][column];
@@ -43,6 +58,9 @@ void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
     currentPawn = newPawn;
     (newPawn == Red)? this->nbRedPawn++ : this->nbBluePawn++;
     //increment the number of colored pawn depending of the color of the newly added newPawn
+}
+void Board::addPawn(Cell pawn, array<unsigned char, 2> position){
+    Board::addPawn(pawn, position[0], position[1]);
 }
 
 void Board::changeColor(unsigned char row, unsigned char column) {
@@ -60,4 +78,22 @@ void Board::changeColor(unsigned char row, unsigned char column) {
         this->nbRedPawn--;
         this->nbBluePawn++;
     }
+}
+void Board::changeColor(array<unsigned char, 2> position){
+    changeColor(position[0], position[1]);
+}
+
+void Board::movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn){
+    coordinatesValidation(originalRow, originalColumn);
+    coordinatesValidation(destinationRow, destinationColumn);
+    Cell& currentPawn = this->grid[originalRow][originalColumn];
+    Cell& newPawn = this->grid[destinationRow][destinationColumn];
+    if(newPawn != empty){
+        throw used_square<Cell>("movePawn()", newPawn);
+    }
+    newPawn = currentPawn;
+    currentPawn = empty;
+}
+void Board::movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination){
+    movePawn(origin[0], origin[1], destination[0], destination[1]);
 }
