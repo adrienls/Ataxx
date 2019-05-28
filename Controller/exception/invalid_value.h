@@ -15,27 +15,33 @@ using std::endl;
 using std::exception;
 using std::stringstream;
 
-template<typename Error>
 class invalid_value : public exception{
 private:
     string functionName;
-    Error value;
+    string value;
     string specificMessage;
+    string displayError;
 public:
     invalid_value() = delete;
-    invalid_value(const invalid_value& e) noexcept : invalid_value(e.getFunctionName(), e.getValue(), e.getSpecificMessage()) {}
-    invalid_value(const string& functionName, Error value, const string& specificMessage = "") noexcept : functionName(functionName), value(value), specificMessage(specificMessage) {}
+    invalid_value(const invalid_value& e) noexcept
+    : invalid_value(e.getFunctionName(), e.getValue(), e.getSpecificMessage()) {}
+
+    invalid_value(const string& functionName, const string& value, const string& specificMessage = "") noexcept
+    : functionName(functionName), value(value), specificMessage(specificMessage) {
+        stringstream what;
+        what << "Invalid value: \"" << this->value << "\", used in function \""
+        << this->functionName << "\". " << this->specificMessage;
+        this->displayError = what.str();
+    }
+
     virtual ~invalid_value() = default;
 
     const string &getFunctionName() const {return functionName;}
-    Error getValue() const {return value;}
+    const string &getValue() const {return value;}
     const string &getSpecificMessage() const {return specificMessage;}
 
     virtual const char* what() const noexcept override{
-        stringstream what;
-        what << "Invalid value: \"" << this->value << "\", used in function \"" << this->functionName
-             << "\". " << this->specificMessage << endl;
-        return what.str().c_str();
+        return this->displayError.c_str();
     }
 };
 

@@ -6,6 +6,8 @@
 #include "../Controller/exception/used_square.h"
 #include "../Controller/exception/bad_board_coordinates.h"
 
+using std::to_string;
+
 Board::Board() noexcept {
     for(array<Cell, 7>& row : this->grid){
         for(Cell& pawn : row){
@@ -20,16 +22,16 @@ Board::Board() noexcept {
 
 void Board::coordinatesValidation(unsigned char row, unsigned char column) {
     if(row > 6){
-        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): row too big", row);
+        throw bad_board_coordinates("coordinatesValidation(): row too big", to_string(row));
     }
     if(row < 0){
-        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): row too small", row);
+        throw bad_board_coordinates("coordinatesValidation(): row too small", to_string(row));
     }
     if(column > 6){
-        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): column too big", column);
+        throw bad_board_coordinates("coordinatesValidation(): column too big", to_string(column));
     }
     if(column < 0){
-        throw bad_board_coordinates<unsigned char>("coordinatesValidation(): column too small", column);
+        throw bad_board_coordinates("coordinatesValidation(): column too small", to_string(column));
     }
 }
 void Board::coordinatesValidation(array<unsigned char, 2> position) {
@@ -54,7 +56,7 @@ Cell& Board::getPawn(array<unsigned char, 2> position) {
 void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
     Cell& currentPawn = getPawn(row, column);
     if(currentPawn != empty){
-        throw used_square<Cell>("addPawn()", currentPawn);
+        throw used_square("addPawn()", to_string(currentPawn));
     }
     currentPawn = newPawn;
     (newPawn == Red)? this->nbRedPawn++ : this->nbBluePawn++;
@@ -86,7 +88,7 @@ void Board::movePawn(unsigned char originalRow, unsigned char originalColumn, un
     Cell& newPawn = getPawn(destinationRow, destinationColumn);
     if(newPawn != empty){
         //makes sure the target cell for the pawn is available
-        throw used_square<Cell>("movePawn()", newPawn);
+        throw used_square("movePawn()", to_string(newPawn));
     }
     //moves the pawn and free the old cell
     newPawn = currentPawn;
@@ -114,10 +116,9 @@ void Board::movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> des
     movePawn(origin[0], origin[1], destination[0], destination[1]);
 }
 
-const vector<array<unsigned char, 2>> Board::availableMoves(unsigned char selectedRow, unsigned char selectedColumn){
+const vector<array<unsigned char, 2>>& Board::availableMoves(unsigned char selectedRow, unsigned char selectedColumn){
     coordinatesValidation(selectedRow, selectedColumn);
     //checks the selected pawn is on the board
-    vector<array<unsigned char, 2>> availableCells;
     for(unsigned char row = selectedRow-2; row != selectedRow+2; row++){
         //makes sure the row is still on the board
         if(row >=0 && row <= 6){
@@ -128,7 +129,7 @@ const vector<array<unsigned char, 2>> Board::availableMoves(unsigned char select
                     if(row != selectedRow && column != selectedColumn){
                         if(this->grid[row][column] == empty){
                             //add all the cells that are not empty and in a range of two cells in the vector
-                            availableCells.push_back({row, column});
+                            this->availableCells.push_back({row, column});
                         }
                     }
                 }
@@ -136,8 +137,8 @@ const vector<array<unsigned char, 2>> Board::availableMoves(unsigned char select
         }
     }
     //return a vector with the position of all the available moves
-    return availableCells;
+    return this->availableCells;
 }
-const vector<array<unsigned char, 2>> Board::availableMoves(array<unsigned char, 2> position){
-    availableMoves(position[0], position[1]);
+const vector<array<unsigned char, 2>>& Board::availableMoves(array<unsigned char, 2> position){
+    return availableMoves(position[0], position[1]);
 }

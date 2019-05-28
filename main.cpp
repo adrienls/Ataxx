@@ -1,9 +1,6 @@
-#include <iostream>
-#include "Controller/Arguments.h"
+#include "Controller/MainApp.h"
 
 int main(int argc, char** argv) {
-    Arguments* arg = new Arguments(argc, argv);
-    arg->display();
-    delete arg;
+    MainApp app(argc, argv);
     return 0;
 }

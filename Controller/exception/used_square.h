@@ -7,13 +7,12 @@
 
 #include "invalid_value.h"
 
-template<typename Error>
-class used_square : public invalid_value<Error>{
+class used_square : public invalid_value{
 public:
     used_square() = delete;
     used_square(const used_square& e) noexcept : used_square(e.getFunctionName(), e.getValue()) {}
-    used_square(const string &functionName, Error value) noexcept :
-    invalid_value<Error>(functionName, value, "Board square is already used.") {}
+    used_square(const string& functionName, const string& value) noexcept
+    : invalid_value(functionName, value, "Board square is already used.") {}
     virtual ~used_square() = default;
 };
 

@@ -6,13 +6,13 @@
 #include <bits/stl_pair.h>
 #include <iostream>
 #include "Arguments.h"
-#include "exception/invalid_argument.h"
+#include "exception/too_many_arguments.h"
 
 using std::pair;
 using std::cout;
 using std::endl;
 
-Arguments::Arguments(const int& argc, char* const* const argv, const char* const shortOpts, struct option longOpts[]) {
+Arguments::Arguments(const int& argc, char* const* const argv, const char* const shortOpts, const struct option longOpts[]) {
     int optionIndex = 0; //getopt_long stores the option index here
     int optionValue = getopt_long(argc, argv, shortOpts, longOpts, &optionIndex);
 
@@ -25,21 +25,23 @@ Arguments::Arguments(const int& argc, char* const* const argv, const char* const
     }
 
     if (optind < argc) {
-        vector<string> invalidArguments;
-        //Saves any remaining command line argument in a vector (not options)
+        stringstream invalidArguments;
+        //Saves any remaining command line argument in a stringstream (not options)
+        invalidArguments << argv[optind];
+        optind++;
         while (optind < argc){
-            invalidArguments.emplace_back(argv[optind]);
+            invalidArguments << ", " << argv[optind];
             optind++;
         }
-        throw invalid_argument<vector<string>>("Arguments() constructor", invalidArguments);
+        throw too_many_arguments("Arguments() constructor", invalidArguments.str());
     }
 }
 
-const map<char, string> &Arguments::getOptions() const {
+const map<char, string> &Arguments::getOptions() const noexcept{
     return options;
 }
 
-void Arguments::display(){
+void Arguments::display() noexcept{
     cout << endl << "Options and corresponding arguments: " << endl;
     for (const auto& opt : this->options){
         cout << opt.first << " => " << opt.second << endl;

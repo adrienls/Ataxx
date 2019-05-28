@@ -7,13 +7,12 @@
 
 #include "invalid_value.h"
 
-template<typename Error>
-class bad_board_coordinates : public invalid_value<Error>{
+class bad_board_coordinates : public invalid_value{
 public:
     bad_board_coordinates() = delete;
     bad_board_coordinates(const bad_board_coordinates& e) noexcept : bad_board_coordinates(e.getFunctionName(), e.getValue()) {}
-    bad_board_coordinates(const string &functionName, Error value) noexcept :
-    invalid_value<Error>(functionName, value, "Pawn coordinates are out of the board. Coordinates need to be between 0 and 6.") {}
+    bad_board_coordinates(const string& functionName, const string& value) noexcept
+    : invalid_value(functionName, value, "Pawn coordinates are out of the board. Coordinates need to be between 0 and 6.") {}
     virtual ~bad_board_coordinates() = default;
 };
 

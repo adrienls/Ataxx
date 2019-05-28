@@ -15,6 +15,7 @@ using std::vector;
 class Board {
 private:
     array<array<Cell, 7>, 7> grid;
+    vector<array<unsigned char, 2>> availableCells;
     unsigned char nbRedPawn = 2;
     unsigned char nbBluePawn = 2;
 
@@ -40,8 +41,8 @@ public:
     void movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn);
     inline void movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination);
 
-    const vector<array<unsigned char, 2>> availableMoves(unsigned char selectedRow, unsigned char selectedColumn);
-    inline const vector<array<unsigned char, 2>> availableMoves(array<unsigned char, 2> position);
+    const vector<array<unsigned char, 2>>& availableMoves(unsigned char selectedRow, unsigned char selectedColumn);
+    inline const vector<array<unsigned char, 2>>& availableMoves(array<unsigned char, 2> position);
 };
 
 #endif //ATAXX_BOARD_H
