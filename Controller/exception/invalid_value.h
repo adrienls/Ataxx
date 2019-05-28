@@ -23,9 +23,14 @@ private:
     string specificMessage;
 public:
     invalid_value() = delete;
-    invalid_value(const invalid_value& e) noexcept : invalid_value(e.functionName, e.value, e.specificMessage) {}
+    invalid_value(const invalid_value& e) noexcept : invalid_value(e.getFunctionName(), e.getValue(), e.getSpecificMessage()) {}
     invalid_value(const string& functionName, Error value, const string& specificMessage = "") noexcept : functionName(functionName), value(value), specificMessage(specificMessage) {}
     virtual ~invalid_value() = default;
+
+    const string &getFunctionName() const {return functionName;}
+    Error getValue() const {return value;}
+    const string &getSpecificMessage() const {return specificMessage;}
+
     virtual const char* what() const noexcept override{
         stringstream what;
         what << "Invalid value: \"" << this->value << "\", used in function \"" << this->functionName

@@ -5,7 +5,6 @@
 #include "Board.h"
 #include "../Controller/exception/used_square.h"
 #include "../Controller/exception/bad_board_coordinates.h"
-#include "../Controller/exception/empty_square.h"
 
 Board::Board() noexcept {
     for(array<Cell, 7>& row : this->grid){
@@ -33,6 +32,9 @@ void Board::coordinatesValidation(unsigned char row, unsigned char column) {
         throw bad_board_coordinates<unsigned char>("coordinatesValidation(): column too small", column);
     }
 }
+void Board::coordinatesValidation(array<unsigned char, 2> position) {
+    coordinatesValidation(position[0], position[1]);
+}
 
 unsigned char Board::getNbRedPawn() const noexcept {
     return nbRedPawn;
@@ -41,17 +43,16 @@ unsigned char Board::getNbBluePawn() const noexcept {
     return nbBluePawn;
 }
 
-const Cell Board::getPawn(unsigned char row, unsigned char column) const {
+Cell& Board::getPawn(unsigned char row, unsigned char column) {
     Board::coordinatesValidation(row, column);
     return this->grid[row][column];
 }
-const Cell Board::getPawn(array<unsigned char, 2> position) const {
+Cell& Board::getPawn(array<unsigned char, 2> position) {
     return getPawn(position[0], position[1]);
 }
 
 void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
-    Board::coordinatesValidation(row, column);
-    Cell& currentPawn = this->grid[row][column];
+    Cell& currentPawn = getPawn(row, column);
     if(currentPawn != empty){
         throw used_square<Cell>("addPawn()", currentPawn);
     }
@@ -64,17 +65,14 @@ void Board::addPawn(Cell pawn, array<unsigned char, 2> position){
 }
 
 void Board::changeColor(unsigned char row, unsigned char column) {
-    Board::coordinatesValidation(row, column);
-    Cell& currentPawn = this->grid[row][column];
-    if(currentPawn == empty){
-        throw empty_square<Cell>("changeColor()", currentPawn);
-    }
-    currentPawn = (currentPawn == Red)? Blue : Red;
-    if(currentPawn == Red){
+    Cell& currentPawn = getPawn(row, column);
+    if(currentPawn == Blue){
+        currentPawn = Red;
         this->nbRedPawn++;
         this->nbBluePawn--;
     }
-    else{
+    else if(currentPawn == Red){
+        currentPawn = Blue;
         this->nbRedPawn--;
         this->nbBluePawn++;
     }
@@ -84,16 +82,62 @@ void Board::changeColor(array<unsigned char, 2> position){
 }
 
 void Board::movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn){
-    coordinatesValidation(originalRow, originalColumn);
-    coordinatesValidation(destinationRow, destinationColumn);
-    Cell& currentPawn = this->grid[originalRow][originalColumn];
-    Cell& newPawn = this->grid[destinationRow][destinationColumn];
+    Cell& currentPawn = getPawn(originalRow, originalColumn);
+    Cell& newPawn = getPawn(destinationRow, destinationColumn);
     if(newPawn != empty){
+        //makes sure the target cell for the pawn is available
         throw used_square<Cell>("movePawn()", newPawn);
     }
+    //moves the pawn and free the old cell
     newPawn = currentPawn;
     currentPawn = empty;
+    for(unsigned char row = destinationRow-1; row != destinationRow+1; row++){
+        //makes sure the row is still on the board
+        if(row >=0 && row <= 6){
+            for(unsigned char column = destinationColumn-1; column != destinationColumn+1; column++){
+                //makes sure the column is still on the board
+                if(column >=0 && column <= 6){
+                    //avoid changing the color of the recently moved pawn
+                    if(row != destinationRow && column != destinationColumn){
+                        Cell& adjacentPawn = this->grid[row][column];
+                        //change the color of every adjacent cell if the color is different and the cell is not empty
+                        if(adjacentPawn != newPawn && adjacentPawn != empty){
+                            changeColor(row, column);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 void Board::movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination){
     movePawn(origin[0], origin[1], destination[0], destination[1]);
+}
+
+const vector<array<unsigned char, 2>> Board::availableMoves(unsigned char selectedRow, unsigned char selectedColumn){
+    coordinatesValidation(selectedRow, selectedColumn);
+    //checks the selected pawn is on the board
+    vector<array<unsigned char, 2>> availableCells;
+    for(unsigned char row = selectedRow-2; row != selectedRow+2; row++){
+        //makes sure the row is still on the board
+        if(row >=0 && row <= 6){
+            for(unsigned char column = selectedColumn-2; column != selectedColumn+2; column++){
+                //makes sure the column is still on the board
+                if(column >=0 && column <= 6){
+                    //avoid adding the selected pawn to the vector
+                    if(row != selectedRow && column != selectedColumn){
+                        if(this->grid[row][column] == empty){
+                            //add all the cells that are not empty and in a range of two cells in the vector
+                            availableCells.push_back({row, column});
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //return a vector with the position of all the available moves
+    return availableCells;
+}
+const vector<array<unsigned char, 2>> Board::availableMoves(array<unsigned char, 2> position){
+    availableMoves(position[0], position[1]);
 }
