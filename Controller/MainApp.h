@@ -11,13 +11,13 @@
 
 class MainApp {
 private:
-    Board board;
-    Arguments* arg;
-    void process(const map<char, string>& options) noexcept;
+    Board* board = nullptr;
+    Arguments* arg = nullptr;
+    static void process(const map<char, string>& options) noexcept;
 public:
     MainApp(const int& argc, char* const* argv);
     virtual ~MainApp();
-    inline void printHelp(const char& exitCode) noexcept;
+    inline static void printHelp(const char& exitCode) noexcept;
 };
 
 
