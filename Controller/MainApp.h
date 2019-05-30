@@ -5,19 +5,22 @@
 #ifndef ATAXX_MAINAPP_H
 #define ATAXX_MAINAPP_H
 
-
+#include <map>
+#include <string>
 #include "../Model/Board.h"
-#include "Arguments.h"
+
+using std::map;
+using std::string;
 
 class MainApp {
 private:
     Board* board = nullptr;
-    Arguments* arg = nullptr;
-    static void process(const map<char, string>& options) noexcept;
+    map<char, string> options;
+    void process();
 public:
     MainApp(const int& argc, char* const* argv);
     virtual ~MainApp();
-    inline static void printHelp(const char& exitCode) noexcept;
+    inline static void printHelp() noexcept;
 };
 
 

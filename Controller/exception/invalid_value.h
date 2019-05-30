@@ -36,9 +36,9 @@ public:
 
     virtual ~invalid_value() = default;
 
-    const string &getFunctionName() const {return functionName;}
-    const string &getValue() const {return value;}
-    const string &getSpecificMessage() const {return specificMessage;}
+    const string &getFunctionName() const noexcept {return functionName;}
+    const string &getValue() const noexcept {return value;}
+    const string &getSpecificMessage() const noexcept {return specificMessage;}
 
     virtual const char* what() const noexcept override{
         return this->displayError.c_str();

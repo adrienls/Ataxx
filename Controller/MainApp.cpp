@@ -4,18 +4,22 @@
 
 #include <getopt.h>
 #include "MainApp.h"
-#include "Arguments.h"
-#include "exception/too_many_arguments.h"
+#include "arguments.h"
 #include <iostream>
+#include <sstream>
 
 using std::cout;
 using std::endl;
+using std::invalid_argument;
+using std::stringstream;
 
 MainApp::MainApp(const int &argc, char *const *argv) {
 
     if(argc == 1){
-        cout << "Option required!" << endl;
-        printHelp(EXIT_FAILURE);
+        throw invalid_argument("Option required!");
+    }
+    else if(argc > 3){
+        throw invalid_argument("Too many arguments!");
     }
 
     const char* const shortOpts = "hm:";
@@ -25,32 +29,25 @@ MainApp::MainApp(const int &argc, char *const *argv) {
             {nullptr, no_argument, nullptr, 0}
     };
 
-    try{
-        this->arg = new Arguments(argc, argv, shortOpts, longOpts);
-    }
-    catch(too_many_arguments& ia){
-        cout << ia.what() << endl;
-        exit(EXIT_FAILURE);
-    }
-    const map<char, string>& options = this->arg->getOptions();
-    process(options);
+    this->options = arguments(argc, argv, shortOpts, longOpts);
+    process();
 }
 
 MainApp::~MainApp() {
-    delete this->arg;
+    delete this->board;
 }
 
-void MainApp::printHelp(const char& exitCode) noexcept {
+void MainApp::printHelp() noexcept {
     cout <<
-    "--mode <console, graphic, mixed>:      Set the display mode" << endl <<
-    "--help:                                Show this help" << endl;
-    exit(exitCode);
+    "-m  or  --mode  <console, graphic, mixed>:      Set the display mode" << endl <<
+    "-h  or  --help:                                 Print Help (this message) and exit" << endl;
 }
 
-void MainApp::process(const map<char, string> &options) noexcept {
-    for(auto opt : options){
+void MainApp::process() {
+    for(auto opt : this->options){
         if(opt.first == 'h'){
-            printHelp(EXIT_SUCCESS);
+            printHelp();
+            break;
         }
         else if(opt.first == 'm'){
             if(opt.second == "console"){
@@ -63,13 +60,15 @@ void MainApp::process(const map<char, string> &options) noexcept {
 
             }
             else{
-                cout << opt.second << " is not a valid argument. Please use --help to check the valid arguments." << endl;
-                exit(EXIT_FAILURE);
+                stringstream invalidArgument;
+                invalidArgument << opt.second << " is not a valid argument. Please check the valid arguments.";
+                throw invalid_argument(invalidArgument.str());
             }
         }
         else{
-            cout << opt.first << " is not a valid option. Please use --help to check the valid options." << endl;
-            exit(EXIT_FAILURE);
+            stringstream invalidArgument;
+            invalidArgument << opt.first << " is not a valid option. Please check the valid options.";
+            throw invalid_argument(invalidArgument.str());
         }
     }
 }
