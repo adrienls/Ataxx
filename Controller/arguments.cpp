@@ -15,7 +15,7 @@ const map<char, string> arguments(const int& argc, char* const* const argv, cons
     int optionIndex = 0; //getopt_long stores the option index here
     int optionValue = getopt_long(argc, argv, shortOpts, longOpts, &optionIndex);
 
-    map<char, string> options;
+    map<char, string> options = {};
 
     while (optionValue != -1) {
         if (optionValue != 0) { //optionValue is 0 if a flag is set

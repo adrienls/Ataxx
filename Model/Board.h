@@ -8,11 +8,12 @@
 #include <array>
 #include <vector>
 #include "Cell.h"
+#include "Subject.h"
 
 using std::array;
 using std::vector;
 
-class Board {
+class Board : public Subject{
 private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned char, 2>> availableCells;
@@ -30,7 +31,7 @@ private:
 
 public:
     Board() noexcept;
-    virtual ~Board() = default;
+    virtual ~Board() override = default;
 
     inline unsigned char getNbRedPawn() const noexcept;
     inline unsigned char getNbBluePawn() const noexcept;
