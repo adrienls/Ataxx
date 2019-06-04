@@ -10,6 +10,7 @@
 
 using std::invalid_argument;
 using std::stringstream;
+using std::exception;
 
 MainApp::MainApp(const int &argc, char *const *argv) {
 
@@ -42,17 +43,14 @@ void MainApp::process() {
             break;
         }
         else if(opt.first == 'm'){
-            this->board = new Board();
             if(opt.second == "console"){
-                ConsoleView* view = new ConsoleView;
-                this->board->addObserver(shared_ptr<ConsoleView>(view));
-                this->board->addPawn(Red, 0, 1);
+                consoleMode();
             }
             else if(opt.second == "graphic"){
-
+                graphicMode();
             }
             else if(opt.second == "mixed"){
-
+                mixedMode();
             }
             else{
                 stringstream invalidArgument;
@@ -67,3 +65,26 @@ void MainApp::process() {
         }
     }
 }
+
+void MainApp::consoleMode() {
+    board = new Board();
+    shared_ptr<ConsoleView> view (new ConsoleView);
+    board->addObserver(view);
+    string currentPlayer;
+    unsigned char row, column;
+    while(!gameOver){
+        try{
+            currentPlayer = (turn)? "Red Player" : "Blue Player";
+            ConsoleView::selectPawn(currentPlayer, row, column);
+            const vector<array<unsigned char, 2>>& cells = board->availableMoves(row, column);
+        }
+        catch (exception& e){
+            cout << e.what() << endl;
+            gameOver = !gameOver;
+        }
+    }
+}
+
+void MainApp::graphicMode() {}
+
+void MainApp::mixedMode() {}

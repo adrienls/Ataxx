@@ -17,8 +17,8 @@ class Board : public Subject{
 private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned char, 2>> availableCells;
-    unsigned char nbRedPawn = 2;//TODO Implémenter la classe player avec nb de pions, yourTurn yes or no, and Win yes or no et une couleur
-    unsigned char nbBluePawn = 2;
+    unsigned short nbRedPawn = 2;//TODO Implémenter la classe player avec nb de pions, yourTurn yes or no, and Win yes or no et une couleur
+    unsigned short nbBluePawn = 2;
 
     static void coordinatesValidation(unsigned char row, unsigned char column);
     static void coordinatesValidation(array<unsigned char, 2> position){//TODO Demander pour le pb inline dans le cpp --> undefined reference
@@ -42,10 +42,10 @@ public:
     const array<array<Cell, 7>, 7> &getGrid() const noexcept{
         return this->grid;
     }
-    unsigned char getNbRedPawn() const noexcept{
+    unsigned short getNbRedPawn() const noexcept{
         return this->nbRedPawn;
     }
-    unsigned char getNbBluePawn() const noexcept{
+    unsigned short getNbBluePawn() const noexcept{
         return this->nbBluePawn;
     }
 

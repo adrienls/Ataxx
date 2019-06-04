@@ -18,7 +18,6 @@ Board::Board() noexcept {
     this->grid[0][6] = Blue;
     this->grid[6][0] = Blue;
     this->grid[6][6] = Red;
-    notifyObservers();
 }
 
 void Board::coordinatesValidation(unsigned char row, unsigned char column) {

@@ -20,6 +20,7 @@ protected:
 public:
     void addObserver(const shared_ptr<Observer>& newObserver) noexcept{
         observers.push_back(newObserver);
+        notifyObservers();
     }
     void removeObserver(const shared_ptr<Observer>& newObserver) noexcept;
 
