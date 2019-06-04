@@ -18,6 +18,7 @@ Board::Board() noexcept {
     this->grid[0][6] = Blue;
     this->grid[6][0] = Blue;
     this->grid[6][6] = Red;
+    notifyObservers();
 }
 
 void Board::coordinatesValidation(unsigned char row, unsigned char column) {
@@ -34,23 +35,10 @@ void Board::coordinatesValidation(unsigned char row, unsigned char column) {
         throw bad_board_coordinates("coordinatesValidation(): column too small", to_string(column));
     }
 }
-void Board::coordinatesValidation(array<unsigned char, 2> position) {
-    coordinatesValidation(position[0], position[1]);
-}
 
-unsigned char Board::getNbRedPawn() const noexcept {
-    return nbRedPawn;
-}
-unsigned char Board::getNbBluePawn() const noexcept {
-    return nbBluePawn;
-}
-
-Cell& Board::getPawn(unsigned char row, unsigned char column) {
+Cell& Board::getPawn(unsigned char row, unsigned char column){
     Board::coordinatesValidation(row, column);
     return this->grid[row][column];
-}
-Cell& Board::getPawn(array<unsigned char, 2> position) {
-    return getPawn(position[0], position[1]);
 }
 
 void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
@@ -61,9 +49,7 @@ void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
     currentPawn = newPawn;
     (newPawn == Red)? this->nbRedPawn++ : this->nbBluePawn++;
     //increment the number of colored pawn depending of the color of the newly added newPawn
-}
-void Board::addPawn(Cell pawn, array<unsigned char, 2> position){
-    Board::addPawn(pawn, position[0], position[1]);
+    notifyObservers();
 }
 
 void Board::changeColor(unsigned char row, unsigned char column) {
@@ -78,9 +64,6 @@ void Board::changeColor(unsigned char row, unsigned char column) {
         this->nbRedPawn--;
         this->nbBluePawn++;
     }
-}
-void Board::changeColor(array<unsigned char, 2> position){
-    changeColor(position[0], position[1]);
 }
 
 void Board::movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn){
@@ -111,9 +94,7 @@ void Board::movePawn(unsigned char originalRow, unsigned char originalColumn, un
             }
         }
     }
-}
-void Board::movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination){
-    movePawn(origin[0], origin[1], destination[0], destination[1]);
+    notifyObservers();
 }
 
 const vector<array<unsigned char, 2>>& Board::availableMoves(unsigned char selectedRow, unsigned char selectedColumn){
@@ -138,7 +119,4 @@ const vector<array<unsigned char, 2>>& Board::availableMoves(unsigned char selec
     }
     //return a vector with the position of all the available moves
     return this->availableCells;
-}
-const vector<array<unsigned char, 2>>& Board::availableMoves(array<unsigned char, 2> position){
-    return availableMoves(position[0], position[1]);
 }

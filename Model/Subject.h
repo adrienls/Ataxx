@@ -18,7 +18,9 @@ private:
 protected:
     void notifyObservers() noexcept;
 public:
-    inline void addObserver(const shared_ptr<Observer>& newObserver) noexcept;
+    void addObserver(const shared_ptr<Observer>& newObserver) noexcept{
+        observers.push_back(newObserver);
+    }
     void removeObserver(const shared_ptr<Observer>& newObserver) noexcept;
 
     Subject() = default;

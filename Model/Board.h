@@ -17,33 +17,52 @@ class Board : public Subject{
 private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned char, 2>> availableCells;
-    unsigned char nbRedPawn = 2;
+    unsigned char nbRedPawn = 2;//TODO Implémenter la classe player avec nb de pions, yourTurn yes or no, and Win yes or no et une couleur
     unsigned char nbBluePawn = 2;
 
     static void coordinatesValidation(unsigned char row, unsigned char column);
-    static void coordinatesValidation(array<unsigned char, 2> position);
+    static void coordinatesValidation(array<unsigned char, 2> position){//TODO Demander pour le pb inline dans le cpp --> undefined reference
+        coordinatesValidation(position[0], position[1]);
+    }
 
-    inline Cell& getPawn(unsigned char row, unsigned char column);
-    inline Cell& getPawn(array<unsigned char, 2> position);
+    Cell& getPawn(unsigned char row, unsigned char column);
+    Cell& getPawn(array<unsigned char, 2> position){
+        return getPawn(position[0], position[1]);
+    }
 
     void changeColor(unsigned char row, unsigned char column);
-    inline void changeColor(array<unsigned char, 2> position);
+    void changeColor(array<unsigned char, 2> position){
+        changeColor(position[0], position[1]);
+    }
 
 public:
     Board() noexcept;
     virtual ~Board() override = default;
 
-    inline unsigned char getNbRedPawn() const noexcept;
-    inline unsigned char getNbBluePawn() const noexcept;
+    const array<array<Cell, 7>, 7> &getGrid() const noexcept{
+        return this->grid;
+    }
+    unsigned char getNbRedPawn() const noexcept{
+        return this->nbRedPawn;
+    }
+    unsigned char getNbBluePawn() const noexcept{
+        return this->nbBluePawn;
+    }
 
     void addPawn(Cell newPawn, unsigned char row, unsigned char column);
-    inline void addPawn(Cell pawn, array<unsigned char, 2> position);
+    void addPawn(Cell pawn, array<unsigned char, 2> position){
+        addPawn(pawn, position[0], position[1]);
+    }
 
     void movePawn(unsigned char originalRow, unsigned char originalColumn, unsigned char destinationRow, unsigned char destinationColumn);
-    inline void movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination);
+    void movePawn(array<unsigned char, 2> origin, array<unsigned char, 2> destination){
+        movePawn(origin[0], origin[1], destination[0], destination[1]);
+    }
 
     const vector<array<unsigned char, 2>>& availableMoves(unsigned char selectedRow, unsigned char selectedColumn);
-    inline const vector<array<unsigned char, 2>>& availableMoves(array<unsigned char, 2> position);
+    const vector<array<unsigned char, 2>>& availableMoves(array<unsigned char, 2> position){
+        return availableMoves(position[0], position[1]);
+    }
 };
 
 #endif //ATAXX_BOARD_H

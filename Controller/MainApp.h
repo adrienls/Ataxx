@@ -7,8 +7,11 @@
 
 #include <map>
 #include <string>
+#include <iostream>
 #include "../Model/Board.h"
 
+using std::cout;
+using std::endl;
 using std::map;
 using std::string;
 
@@ -20,7 +23,11 @@ private:
 public:
     MainApp(const int& argc, char* const* argv);
     virtual ~MainApp();
-    inline static void printHelp() noexcept;
+    static void printHelp() noexcept{
+        cout <<
+             "-m  or  --mode  <console, graphic, mixed>:      Set the display mode" << endl <<
+             "-h  or  --help:                                 Print Help (this message) and exit" << endl;
+    }
 };
 
 

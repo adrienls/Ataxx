@@ -5,11 +5,9 @@
 #include <getopt.h>
 #include "MainApp.h"
 #include "arguments.h"
-#include <iostream>
+#include "../View/Console/ConsoleView.h"
 #include <sstream>
 
-using std::cout;
-using std::endl;
 using std::invalid_argument;
 using std::stringstream;
 
@@ -37,12 +35,6 @@ MainApp::~MainApp() {
     delete this->board;
 }
 
-void MainApp::printHelp() noexcept {
-    cout <<
-    "-m  or  --mode  <console, graphic, mixed>:      Set the display mode" << endl <<
-    "-h  or  --help:                                 Print Help (this message) and exit" << endl;
-}
-
 void MainApp::process() {
     for(auto opt : this->options){
         if(opt.first == 'h'){
@@ -50,8 +42,11 @@ void MainApp::process() {
             break;
         }
         else if(opt.first == 'm'){
+            this->board = new Board();
             if(opt.second == "console"){
-
+                ConsoleView* view = new ConsoleView;
+                this->board->addObserver(shared_ptr<ConsoleView>(view));
+                this->board->addPawn(Red, 0, 1);
             }
             else if(opt.second == "graphic"){
 
