@@ -5,10 +5,10 @@
 #ifndef ATAXX_CONSOLEVIEW_H
 #define ATAXX_CONSOLEVIEW_H
 
-#include "../Observer.h"
+#include "../View.h"
 #include "../../Model/Board.h"
 
-class ConsoleView : public Observer{
+class ConsoleView : public View{
 private:
     void displayConsole(const array<array<Cell, 7>, 7>& grid) noexcept;
 public:
@@ -16,6 +16,8 @@ public:
     virtual ~ConsoleView() noexcept = default;
 
     virtual void update(Subject *subject) override;
+    virtual void getUsernames(string& firstUsername, string& secondUsername) override;
+    virtual void finalResult(Subject* subject) override;
 };
 
 

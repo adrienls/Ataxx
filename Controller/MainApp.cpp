@@ -27,26 +27,25 @@ MainApp::MainApp(const int &argc, char *const *argv) {
             {nullptr, no_argument, nullptr, 0}
     };
 
-    this->options = arguments(argc, argv, shortOpts, longOpts);
+    options = arguments(argc, argv, shortOpts, longOpts);
     process();
 }
 
 MainApp::~MainApp() {
-    delete this->board;
+    delete board;
+    delete redPlayer;
+    delete bluePlayer;
 }
 
 void MainApp::process() {
-    for(auto opt : this->options){
+    for(auto opt : options){
         if(opt.first == 'h'){
             printHelp();
             break;
         }
         else if(opt.first == 'm'){
-            this->board = new Board();
             if(opt.second == "console"){
-                ConsoleView* view = new ConsoleView;
-                this->board->addObserver(shared_ptr<ConsoleView>(view));
-                this->board->addPawn(Red, 0, 1);
+                consoleMode();
             }
             else if(opt.second == "graphic"){
 
@@ -66,4 +65,18 @@ void MainApp::process() {
             throw invalid_argument(invalidArgument.str());
         }
     }
+}
+
+void MainApp::consoleMode() {
+    string firstUsername, secondUsername;
+    shared_ptr<ConsoleView> view (new ConsoleView);
+    view->getUsernames(firstUsername, secondUsername);
+
+    redPlayer = new Player(firstUsername, true, Red);
+    bluePlayer = new Player(secondUsername, false, Blue);
+    board = new Board(redPlayer, bluePlayer);
+    board->addObserver(view);
+
+    board->addPawn(Red, 0, 1);
+    view->finalResult(board);
 }

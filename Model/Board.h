@@ -9,6 +9,7 @@
 #include <vector>
 #include "Cell.h"
 #include "Subject.h"
+#include "Player.h"
 
 using std::array;
 using std::vector;
@@ -17,8 +18,8 @@ class Board : public Subject{
 private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned char, 2>> availableCells;
-    unsigned char nbRedPawn = 2;//TODO Implémenter la classe player avec nb de pions, yourTurn yes or no, and Win yes or no et une couleur
-    unsigned char nbBluePawn = 2;
+    Player* redPlayer;
+    Player* bluePlayer;
 
     static void coordinatesValidation(unsigned char row, unsigned char column);
     static void coordinatesValidation(array<unsigned char, 2> position){//TODO Demander pour le pb inline dans le cpp --> undefined reference
@@ -36,17 +37,24 @@ private:
     }
 
 public:
-    Board() noexcept;
+    Board(Player* redPlayer, Player* bluePlayer) noexcept;
     virtual ~Board() override = default;
 
     const array<array<Cell, 7>, 7> &getGrid() const noexcept{
         return this->grid;
     }
-    unsigned char getNbRedPawn() const noexcept{
-        return this->nbRedPawn;
+    unsigned short getNbRedPawn() const noexcept{
+        return this->redPlayer->getNbPawn();
     }
-    unsigned char getNbBluePawn() const noexcept{
-        return this->nbBluePawn;
+    unsigned short getNbBluePawn() const noexcept{
+        return this->bluePlayer->getNbPawn();
+    }
+
+    Player *getRedPlayer() const {
+        return redPlayer;
+    }
+    Player *getBluePlayer() const {
+        return bluePlayer;
     }
 
     void addPawn(Cell newPawn, unsigned char row, unsigned char column);

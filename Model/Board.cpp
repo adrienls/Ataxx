@@ -8,7 +8,7 @@
 
 using std::to_string;
 
-Board::Board() noexcept {
+Board::Board(Player* redPlayer, Player* bluePlayer) noexcept : redPlayer(redPlayer), bluePlayer(bluePlayer){
     for(array<Cell, 7>& row : this->grid){
         for(Cell& pawn : row){
             pawn = empty;
@@ -47,7 +47,7 @@ void Board::addPawn(Cell newPawn, unsigned char row, unsigned char column) {
         throw used_square("addPawn()", to_string(currentPawn));
     }
     currentPawn = newPawn;
-    (newPawn == Red)? this->nbRedPawn++ : this->nbBluePawn++;
+    (newPawn == Red)? redPlayer->incrementNbPawn() : bluePlayer->incrementNbPawn();
     //increment the number of colored pawn depending of the color of the newly added newPawn
     notifyObservers();
 }
@@ -56,13 +56,13 @@ void Board::changeColor(unsigned char row, unsigned char column) {
     Cell& currentPawn = getPawn(row, column);
     if(currentPawn == Blue){
         currentPawn = Red;
-        this->nbRedPawn++;
-        this->nbBluePawn--;
+        redPlayer->incrementNbPawn();
+        bluePlayer->decrementNbPawn();
     }
     else if(currentPawn == Red){
         currentPawn = Blue;
-        this->nbRedPawn--;
-        this->nbBluePawn++;
+        redPlayer->decrementNbPawn();
+        bluePlayer->incrementNbPawn();
     }
 }
 
