@@ -6,6 +6,7 @@
 #include "../Controller/exception/used_square.h"
 #include "../Controller/exception/bad_board_coordinates.h"
 #include "../Controller/exception/bad_owner.h"
+#include "../Controller/exception/no_more_move.h"
 
 using std::to_string;
 
@@ -49,6 +50,7 @@ void Board::addPawn(Cell newPawn, unsigned short row, unsigned short column) {
     currentPawn = newPawn;
     (newPawn == Red)? nbRedPawn++ : nbBluePawn++;
     //increment the number of colored pawn depending of the color of the newly added newPawn
+    displayOrSelect = true;
     notifyObservers();
 }
 
@@ -78,7 +80,7 @@ void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, 
     currentPawn = empty;
     for(unsigned short row = destinationRow-1; row != destinationRow+1; row++){
         //makes sure the row is still on the board
-        if(row >=0 && row <= 6){
+        if(row >=0 && row <= 6){//TODO correct adjacent cell -> another function + add it to the addPawn function
             for(unsigned short column = destinationColumn-1; column != destinationColumn+1; column++){
                 //makes sure the column is still on the board
                 if(column >=0 && column <= 6){
@@ -94,6 +96,8 @@ void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, 
             }
         }
     }
+    displayOrSelect = true;
+    notifyObservers();
 }
 
 void Board::availableMoves(unsigned short selectedRow, unsigned short selectedColumn){
@@ -132,6 +136,10 @@ void Board::setSelectedPawn(bool turn, unsigned short selectedRow, unsigned shor
     this->selectedPawn[0] = selectedRow;
     this->selectedPawn[1] = selectedColumn;
     availableMoves(selectedRow, selectedColumn);
+    if(availableCells.empty()){
+        throw no_more_move("setSelectedPawn", "availableCells is empty");
+    }
+    displayOrSelect = false;
     notifyObservers();
     this->availableCells.clear();
 }

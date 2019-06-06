@@ -16,20 +16,19 @@ using std::to_string;
 void ConsoleView::update(Subject* subject) {
     Board* board = dynamic_cast<Board*>(subject);
 
-    const array<array<Cell, 7>, 7>& grid = board->getGrid();
-    const vector<array<unsigned short, 2>>& moves = board->getAvailableCells();
-    if(moves.empty()){
+    if(board->isDisplayOrSelect()){
+        const array<array<Cell, 7>, 7>& grid = board->getGrid();
         displayGrid(grid);
     }
     else{
         availableMoves(board);
     }
     nbPawn(board->getNbRedPawn(), board->getNbBluePawn());
-
+    cout << endl << endl;
 }
 
 void ConsoleView::displayGrid(const array<array<Cell, 7>, 7> &grid) noexcept{
-    cout << "Current grid:" << endl;
+    cout << "Please select a pawn:" << endl;
     for(const array<Cell, 7>& row : grid){
         for(const Cell& cell: row){
             if(cell == Red){
@@ -69,9 +68,16 @@ void ConsoleView::nbPawn(unsigned short nbRedPawn, unsigned short nbBluePawn) no
          << endl << "Blue Player has: " << nbBluePawn << endl;
 }
 
-const string ConsoleView::selectPawn(const string& player, unsigned short& row, unsigned short& column) noexcept{
+const string ConsoleView::selectPawn(const string& option, bool turn, unsigned short& row, unsigned short& column) noexcept{
     string input;
-    cout << "Please select a pawn coordinates: " << endl << player << "> ";
+    cout << option << endl;
+    if(turn){
+        cout << termcolor::red << "Red Player" << termcolor::reset;
+    }
+    else{
+        cout << termcolor::blue << "Blue Player" << termcolor::reset;
+    }
+    cout << "> ";
     getline(cin, input);
     cout << endl;
     return input;

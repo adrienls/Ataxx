@@ -18,11 +18,12 @@ private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned short, 2>> availableCells;
     array<unsigned short, 2> selectedPawn;
-    unsigned short nbRedPawn = 2;//TODO Implémenter la classe player avec nb de pions, yourTurn yes or no, and Win yes or no et une couleur
+    bool displayOrSelect = true;//when true use display function in the console
+    unsigned short nbRedPawn = 2;
     unsigned short nbBluePawn = 2;
 
     static void coordinatesValidation(unsigned short row, unsigned short column);
-    static void coordinatesValidation(array<unsigned short, 2> position){//TODO Demander pour le pb inline dans le cpp --> undefined reference
+    static void coordinatesValidation(array<unsigned short, 2> position){
         coordinatesValidation(position[0], position[1]);
     }
 
@@ -55,6 +56,9 @@ public:
     }
     unsigned short getNbBluePawn() const noexcept{
         return this->nbBluePawn;
+    }
+    bool isDisplayOrSelect() const {
+        return displayOrSelect;
     }
 
     const array<unsigned short, 2> &getSelectedPawn() const {

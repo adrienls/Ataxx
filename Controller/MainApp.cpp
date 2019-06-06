@@ -10,7 +10,11 @@
 #include "exception/bad_owner.h"
 #include "exception/bad_board_coordinates.h"
 #include "exception/invalid_input.h"
+#include "exception/no_more_move.h"
+#include "exception/used_square.h"
 #include <sstream>
+
+#define ENDGAME "Thank you for playing Ataxx, we hope to see you back soon!"
 
 using std::invalid_argument;
 using std::stringstream;
@@ -74,38 +78,72 @@ void MainApp::consoleMode() {
     board = new Board();
     shared_ptr<ConsoleView> view (new ConsoleView);
     board->addObserver(view);
-
+    bool selectOrMove = true;
+    stringstream verif;
     string currentPlayer, input;
-    unsigned short row, column;
+    unsigned short row, column, newRow, newColumn;
 
-    while(!gameOver){
+    while(1){
         try {
-            currentPlayer = (turn) ? "Red Player" : "Blue Player";
+            if(selectOrMove){
+                input = "Please select a pawn:";
+                input = ConsoleView::selectPawn(input, turn, row, column);
+                if(input == "exit"){
+                    cout << ENDGAME << endl;
+                    break;
+                }
+                verif.str("");
+                verif.clear();
+                verif << input;
+                if(!(verif >> row) || !(verif >> column)){
+                    selectOrMove = true;
+                    throw invalid_input("selectPawn", input);
+                }
+                board->setSelectedPawn(turn, row, column);
+            }
 
-            input = ConsoleView::selectPawn(currentPlayer, row, column);
+
+            input = "Select a destination from the available moves:";
+            input = ConsoleView::selectPawn(input, turn, newRow, newColumn);
             if(input == "exit"){
-                gameOver = true;
-                cout << "Thank you for playing Ataxx, we hope to see you back soon!" << endl;
+                cout << ENDGAME << endl;
                 break;
             }
-            stringstream verif(input);
-            if(!(verif >> row) || !(verif >> column)){
+
+            verif.str("");
+            verif.clear();
+            verif << input;
+            if(!(verif >> newRow) || !(verif >> newColumn)){
+                selectOrMove = false;
                 throw invalid_input("selectPawn", input);
             }
-            board->setSelectedPawn(turn, row, column);
+            if(newRow != row+1 && newRow != row-1 && newColumn != column+1 && newColumn != column-1) {
+                board->movePawn(row, column, newRow, newColumn);//TODO correct this condition by using the adjacent function
+            }
+            else{
+                board->addPawn((turn) ? Red : Blue, newRow, newColumn);
+            }
 
-
+            turn = !turn;
         }
         catch (invalid_input& ii){
             cout << ii.getSpecificMessage() << " Please try again." << endl;
         }
         catch (bad_board_coordinates& bbc){
+            selectOrMove = true;
             cout << bbc.getSpecificMessage() << " Please try again." << endl;
         }
         catch (bad_owner& bo){
+            selectOrMove = true;
             cout << bo.getSpecificMessage() << " Please try again." << endl;
         }
-        catch (...){
+        catch (no_more_move& nmm){
+            cout << nmm.getSpecificMessage() << " Please try again." << endl << ENDGAME << endl;
+            break;
+        }
+        catch (used_square& us){
+            selectOrMove = false;
+            cout << us.getSpecificMessage() << " Please try again." << endl;
         }
     }
 }

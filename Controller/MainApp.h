@@ -18,7 +18,6 @@ using std::string;
 class MainApp {
 private:
     Board* board = nullptr;
-    bool gameOver = false;
     bool turn = true;   //if set to true it is redPlayer's turn, otherwise it is bluePayer's turn
     map<char, string> options;
 
