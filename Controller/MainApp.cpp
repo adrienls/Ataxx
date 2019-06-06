@@ -6,6 +6,10 @@
 #include "MainApp.h"
 #include "arguments.h"
 #include "../View/Console/ConsoleView.h"
+#include "exception/invalid_value.h"
+#include "exception/bad_owner.h"
+#include "exception/bad_board_coordinates.h"
+#include "exception/invalid_input.h"
 #include <sstream>
 
 using std::invalid_argument;
@@ -70,17 +74,38 @@ void MainApp::consoleMode() {
     board = new Board();
     shared_ptr<ConsoleView> view (new ConsoleView);
     board->addObserver(view);
-    string currentPlayer;
-    unsigned char row, column;
+
+    string currentPlayer, input;
+    unsigned short row, column;
+
     while(!gameOver){
-        try{
-            currentPlayer = (turn)? "Red Player" : "Blue Player";
-            ConsoleView::selectPawn(currentPlayer, row, column);
-            const vector<array<unsigned char, 2>>& cells = board->availableMoves(row, column);
+        try {
+            currentPlayer = (turn) ? "Red Player" : "Blue Player";
+
+            input = ConsoleView::selectPawn(currentPlayer, row, column);
+            if(input == "exit"){
+                gameOver = true;
+                cout << "Thank you for playing Ataxx, we hope to see you back soon!" << endl;
+                break;
+            }
+            stringstream verif(input);
+            if(!(verif >> row) || !(verif >> column)){
+                throw invalid_input("selectPawn", input);
+            }
+            board->setSelectedPawn(turn, row, column);
+
+
         }
-        catch (exception& e){
-            cout << e.what() << endl;
-            gameOver = !gameOver;
+        catch (invalid_input& ii){
+            cout << ii.getSpecificMessage() << " Please try again." << endl;
+        }
+        catch (bad_board_coordinates& bbc){
+            cout << bbc.getSpecificMessage() << " Please try again." << endl;
+        }
+        catch (bad_owner& bo){
+            cout << bo.getSpecificMessage() << " Please try again." << endl;
+        }
+        catch (...){
         }
     }
 }

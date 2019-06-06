@@ -2,22 +2,63 @@
 // Created by adrien on 03/06/19.
 //
 
+#include <sstream>
 #include "ConsoleView.h"
+#include "../../Controller/exception/invalid_input.h"
+#include "../termcolor/termcolor.hpp"
+
 using std::cout;
 using std::endl;
 using std::cin;
+using std::stringstream;
+using std::to_string;
 
 void ConsoleView::update(Subject* subject) {
     Board* board = dynamic_cast<Board*>(subject);
-    displayGrid(board->getGrid());
+
+    const array<array<Cell, 7>, 7>& grid = board->getGrid();
+    const vector<array<unsigned short, 2>>& moves = board->getAvailableCells();
+    if(moves.empty()){
+        displayGrid(grid);
+    }
+    else{
+        availableMoves(board);
+    }
     nbPawn(board->getNbRedPawn(), board->getNbBluePawn());
 
 }
 
 void ConsoleView::displayGrid(const array<array<Cell, 7>, 7> &grid) noexcept{
+    cout << "Current grid:" << endl;
     for(const array<Cell, 7>& row : grid){
         for(const Cell& cell: row){
-            cout << cell << "  ";
+            if(cell == Red){
+                cout << termcolor::red;
+            }
+            else if(cell == Blue){
+                cout << termcolor::blue;
+            }
+            cout << cell << termcolor::reset << "  ";
+        }
+        cout << endl;
+    }
+}
+
+void ConsoleView::availableMoves(Board* board) noexcept{
+    cout << "Available moves:" << endl;
+    const array<array<Cell, 7>, 7>& grid = board->getGrid();
+    for(unsigned short row = 0; row <= 6; row++){
+        for(unsigned short column = 0; column <= 6; column++){
+            if(board->isAvailableMove(row, column)){
+                cout << termcolor::green;
+            }
+            else if(grid[row][column] == Red){
+                cout << termcolor::red;
+            }
+            else if(grid[row][column] == Blue){
+                cout << termcolor::blue;
+            }
+            cout << grid[row][column] << termcolor::reset << "  ";
         }
         cout << endl;
     }
@@ -28,12 +69,10 @@ void ConsoleView::nbPawn(unsigned short nbRedPawn, unsigned short nbBluePawn) no
          << endl << "Blue Player has: " << nbBluePawn << endl;
 }
 
-void ConsoleView::selectPawn(string player, unsigned char &row, unsigned char &column) noexcept{
+const string ConsoleView::selectPawn(const string& player, unsigned short& row, unsigned short& column) noexcept{
+    string input;
     cout << "Please select a pawn coordinates: " << endl << player << "> ";
-    cin >> row >> column;//TODO use stringstream and check user data
+    getline(cin, input);
     cout << endl;
-}
-
-void ConsoleView::availableCells(const vector<array<unsigned char, 2>>& cells) noexcept{
-    cout << "ok" << endl;
+    return input;
 }
