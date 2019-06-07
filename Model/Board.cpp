@@ -54,6 +54,9 @@ void Board::addPawn(Cell newPawn, unsigned short row, unsigned short column) {
     currentPawn = newPawn;
     (newPawn == Red)? nbRedPawn++ : nbBluePawn++;
     //increment the number of colored pawn depending of the color of the newly added newPawn
+
+    changeAdjacentCellsColor(newPawn, row, column);
+
     displayOrAvailableMoves = true;
     notifyObservers();
 }
@@ -86,9 +89,16 @@ void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, 
     newPawn = currentPawn;
     currentPawn = empty;
 
+    changeAdjacentCellsColor(newPawn, destinationRow, destinationColumn);
+
+    displayOrAvailableMoves = true;
+    notifyObservers();
+}
+
+void Board::changeAdjacentCellsColor(const Cell& newPawn, unsigned short destinationRow, unsigned short destinationColumn){
     for(short row = destinationRow-1; row <= destinationRow+1; row++){
         //makes sure the row is still on the board
-        if(row >=0 && row <= 6){//TODO correct adjacent cell -> another function + add it to the addPawn function
+        if(row >=0 && row <= 6){
             for(short column = destinationColumn-1; column <= destinationColumn+1; column++){
                 //makes sure the column is still on the board
                 if(column >=0 && column <= 6){
@@ -104,8 +114,6 @@ void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, 
             }
         }
     }
-    displayOrAvailableMoves = true;
-    notifyObservers();
 }
 
 void Board::availableMoves(unsigned short selectedRow, unsigned short selectedColumn){

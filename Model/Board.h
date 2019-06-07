@@ -23,26 +23,12 @@ private:
     unsigned short nbBluePawn = 2;
 
     static void coordinatesValidation(unsigned short row, unsigned short column);
-    static void coordinatesValidation(array<unsigned short, 2> position){
-        coordinatesValidation(position[0], position[1]);
-    }
-
     void verifyOwnership(bool turn, unsigned short selectedRow, unsigned short selectedColumn);
-
     void availableMoves(unsigned short selectedRow, unsigned short selectedColumn);
-    void availableMoves(array<unsigned short, 2> position){
-        availableMoves(position[0], position[1]);
-    }
-
     Cell& getPawn(unsigned short row, unsigned short column);
-    Cell& getPawn(array<unsigned short, 2> position){
-        return getPawn(position[0], position[1]);
-    }
 
     void changeColor(unsigned short row, unsigned short column);
-    void changeColor(array<unsigned short, 2> position){
-        changeColor(position[0], position[1]);
-    }
+    void changeAdjacentCellsColor(const Cell& newPawn, unsigned short destinationRow, unsigned short destinationColumn);
 
 public:
     Board() noexcept;

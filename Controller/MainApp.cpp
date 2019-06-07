@@ -82,7 +82,7 @@ void MainApp::consoleMode() {
     bool selectOrMove = true;
     stringstream verif;
     string currentPlayer, input;
-    unsigned short row, column, newRow, newColumn;
+    unsigned short row = 0, column = 0, newRow = 0, newColumn = 0;
 
     while(true){
         try {
@@ -133,6 +133,7 @@ void MainApp::consoleMode() {
                 cout << "Red Player has won!" << endl << ENDGAME << endl;
                 break;
             }
+            selectOrMove = true;
             turn = !turn;
         }
         catch (invalid_input& ii){
