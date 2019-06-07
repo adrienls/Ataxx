@@ -7,6 +7,7 @@
 #include "../Controller/exception/bad_board_coordinates.h"
 #include "../Controller/exception/bad_owner.h"
 #include "../Controller/exception/no_more_move.h"
+#include "../Controller/exception/not_available_move.h"
 
 using std::to_string;
 
@@ -43,6 +44,9 @@ Cell& Board::getPawn(unsigned short row, unsigned short column){
 }
 
 void Board::addPawn(Cell newPawn, unsigned short row, unsigned short column) {
+    if(!isAvailableMove(row, column)){
+        throw not_available_move("addPawn", to_string(row) + " " + to_string(column));
+    }
     Cell& currentPawn = getPawn(row, column);
     if(currentPawn != empty){
         throw used_square("addPawn()", to_string(currentPawn));
@@ -50,7 +54,7 @@ void Board::addPawn(Cell newPawn, unsigned short row, unsigned short column) {
     currentPawn = newPawn;
     (newPawn == Red)? nbRedPawn++ : nbBluePawn++;
     //increment the number of colored pawn depending of the color of the newly added newPawn
-    displayOrSelect = true;
+    displayOrAvailableMoves = true;
     notifyObservers();
 }
 
@@ -69,6 +73,9 @@ void Board::changeColor(unsigned short row, unsigned short column) {
 }
 
 void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, unsigned short destinationRow, unsigned short destinationColumn){
+    if(!isAvailableMove(destinationRow, destinationColumn)){
+        throw not_available_move("addPawn", to_string(destinationRow) + " " + to_string(destinationColumn));
+    }
     Cell& currentPawn = getPawn(originalRow, originalColumn);
     Cell& newPawn = getPawn(destinationRow, destinationColumn);
     if(newPawn != empty){
@@ -78,25 +85,26 @@ void Board::movePawn(unsigned short originalRow, unsigned short originalColumn, 
     //moves the pawn and free the old cell
     newPawn = currentPawn;
     currentPawn = empty;
-    for(unsigned short row = destinationRow-1; row != destinationRow+1; row++){
+
+    for(short row = destinationRow-1; row <= destinationRow+1; row++){
         //makes sure the row is still on the board
         if(row >=0 && row <= 6){//TODO correct adjacent cell -> another function + add it to the addPawn function
-            for(unsigned short column = destinationColumn-1; column != destinationColumn+1; column++){
+            for(short column = destinationColumn-1; column <= destinationColumn+1; column++){
                 //makes sure the column is still on the board
                 if(column >=0 && column <= 6){
                     //avoid changing the color of the recently moved pawn
-                    if(row != destinationRow && column != destinationColumn){
+                    if(row != destinationRow || column != destinationColumn){
                         Cell& adjacentPawn = this->grid[row][column];
                         //change the color of every adjacent cell if the color is different and the cell is not empty
                         if(adjacentPawn != newPawn && adjacentPawn != empty){
-                            changeColor(row, column);
+                            changeColor((unsigned short)row, (unsigned short)column);
                         }
                     }
                 }
             }
         }
     }
-    displayOrSelect = true;
+    displayOrAvailableMoves = true;
     notifyObservers();
 }
 
@@ -132,6 +140,7 @@ void Board::verifyOwnership(bool turn, unsigned short selectedRow, unsigned shor
 }
 
 void Board::setSelectedPawn(bool turn, unsigned short selectedRow, unsigned short selectedColumn){
+    this->availableCells.clear();
     verifyOwnership(turn, selectedRow, selectedColumn);
     this->selectedPawn[0] = selectedRow;
     this->selectedPawn[1] = selectedColumn;
@@ -139,9 +148,31 @@ void Board::setSelectedPawn(bool turn, unsigned short selectedRow, unsigned shor
     if(availableCells.empty()){
         throw no_more_move("setSelectedPawn", "availableCells is empty");
     }
-    displayOrSelect = false;
+    displayOrAvailableMoves = false;
     notifyObservers();
-    this->availableCells.clear();
+}
+
+bool Board::isAdjacent(unsigned short selectedRow, unsigned short selectedColumn, unsigned short testRow, unsigned short testColumn) noexcept{
+    coordinatesValidation(selectedRow, selectedColumn);
+    //checks the selected pawn is on the board
+    for(short row = selectedRow-1; row <= selectedRow+1; row++){//check the row before and after the current one
+        //makes sure the row is still on the board
+        if(row >=0 && row <= 6){
+            for(short column = selectedColumn-1; column <= selectedColumn+1; column++){//check the column before and after the current one
+                //makes sure the column is still on the board
+                if(column >=0 && column <= 6){
+                    //avoid adding the selected pawn to the vector
+                    //so it continues if one of the two coordinate is different
+                    if(row != selectedRow || column != selectedColumn){
+                        if(row == testRow && column == testColumn){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 bool Board::isAvailableMove(array<unsigned short, 2> position){

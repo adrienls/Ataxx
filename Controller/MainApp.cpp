@@ -12,6 +12,7 @@
 #include "exception/invalid_input.h"
 #include "exception/no_more_move.h"
 #include "exception/used_square.h"
+#include "exception/not_available_move.h"
 #include <sstream>
 
 #define ENDGAME "Thank you for playing Ataxx, we hope to see you back soon!"
@@ -83,7 +84,7 @@ void MainApp::consoleMode() {
     string currentPlayer, input;
     unsigned short row, column, newRow, newColumn;
 
-    while(1){
+    while(true){
         try {
             if(selectOrMove){
                 input = "Please select a pawn:";
@@ -117,13 +118,21 @@ void MainApp::consoleMode() {
                 selectOrMove = false;
                 throw invalid_input("selectPawn", input);
             }
-            if(newRow != row+1 && newRow != row-1 && newColumn != column+1 && newColumn != column-1) {
-                board->movePawn(row, column, newRow, newColumn);//TODO correct this condition by using the adjacent function
-            }
-            else{
+            if(Board::isAdjacent(row, column, newRow, newColumn)) {
                 board->addPawn((turn) ? Red : Blue, newRow, newColumn);
             }
+            else{
+                board->movePawn(row, column, newRow, newColumn);//TODO correct this condition by using the adjacent function
+            }
 
+            if(board->getNbRedPawn() == 0){
+                cout << "Blue Player has won!" << endl << ENDGAME << endl;
+                break;
+            }
+            else if(board->getNbBluePawn() == 0){
+                cout << "Red Player has won!" << endl << ENDGAME << endl;
+                break;
+            }
             turn = !turn;
         }
         catch (invalid_input& ii){
@@ -144,6 +153,10 @@ void MainApp::consoleMode() {
         catch (used_square& us){
             selectOrMove = false;
             cout << us.getSpecificMessage() << " Please try again." << endl;
+        }
+        catch (not_available_move& nam){
+            selectOrMove = false;
+            cout << nam.getSpecificMessage() << " Please try again." << endl;
         }
     }
 }

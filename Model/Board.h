@@ -18,7 +18,7 @@ private:
     array<array<Cell, 7>, 7> grid;
     vector<array<unsigned short, 2>> availableCells;
     array<unsigned short, 2> selectedPawn;
-    bool displayOrSelect = true;//when true use display function in the console
+    bool displayOrAvailableMoves = true;//when true use display function in the console
     unsigned short nbRedPawn = 2;
     unsigned short nbBluePawn = 2;
 
@@ -57,8 +57,8 @@ public:
     unsigned short getNbBluePawn() const noexcept{
         return this->nbBluePawn;
     }
-    bool isDisplayOrSelect() const {
-        return displayOrSelect;
+    bool isDisplayOrAvailableMoves() const {
+        return displayOrAvailableMoves;
     }
 
     const array<unsigned short, 2> &getSelectedPawn() const {
@@ -70,6 +70,11 @@ public:
     bool isAvailableMove(array<unsigned short, 2> position);
     bool isAvailableMove(unsigned short selectedRow, unsigned short selectedColumn){
         return isAvailableMove({selectedRow, selectedColumn});
+    }
+
+    static bool isAdjacent(unsigned short selectedRow, unsigned short selectedColumn, unsigned short testRow, unsigned short testColumn) noexcept;
+    static bool isAdjacent(array<unsigned short, 2> originalPosition, array<unsigned short, 2> destinationPosition) noexcept{
+        return isAdjacent(originalPosition[0], originalPosition[1], destinationPosition[0], destinationPosition[1]);
     }
 
     void setSelectedPawn(bool turn, unsigned short selectedRow, unsigned short selectedColumn);

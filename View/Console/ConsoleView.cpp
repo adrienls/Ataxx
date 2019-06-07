@@ -16,7 +16,7 @@ using std::to_string;
 void ConsoleView::update(Subject* subject) {
     Board* board = dynamic_cast<Board*>(subject);
 
-    if(board->isDisplayOrSelect()){
+    if(board->isDisplayOrAvailableMoves()){
         const array<array<Cell, 7>, 7>& grid = board->getGrid();
         displayGrid(grid);
     }
