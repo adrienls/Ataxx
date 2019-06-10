@@ -6,7 +6,7 @@ This Ataxx game has two available arguments. You can use '--help' to see the dif
 
 The graphical mode is easily understandable as you just play the game intuitively with the usual Ataxx rules. However, the console mode is detailed below.
 
-###Rules
+### Rules
 The game includes two pawn colors (red and blue) and a 7x7 grid.
 We start from an initial configuration where a certain number of pawns are already placed (in the 4 corners of the grid).
 The players take turns and are forced to move one of their pieces.
@@ -72,7 +72,7 @@ We use [Git](https://git-scm.com/) for versioning.
 ## License
 This project is licensed under the GNU AGPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
 
-License chosed thanks to [choosealicense.com](https://choosealicense.com/)
+License chosen thanks to [choosealicense.com](https://choosealicense.com/)
 
 ## Acknowledgments
 This game is the final Qt project of my second year of engineering school in France.
