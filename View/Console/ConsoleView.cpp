@@ -2,7 +2,6 @@
 // Created by adrien on 03/06/19.
 //
 
-#include <sstream>
 #include "ConsoleView.h"
 #include "../../Controller/exception/invalid_input.h"
 #include "../termcolor/termcolor.hpp"
@@ -10,7 +9,6 @@
 using std::cout;
 using std::endl;
 using std::cin;
-using std::stringstream;
 using std::to_string;
 
 void ConsoleView::update(Subject* subject) {
@@ -81,4 +79,8 @@ const string ConsoleView::selectPawn(const string& option, bool turn, unsigned s
     getline(cin, input);
     cout << endl;
     return input;
+}
+
+void ConsoleView::printMessage(const string& message){
+    cout << message << endl;
 }

@@ -17,11 +17,12 @@ private:
     static void nbPawn(unsigned short nbRedPawn, unsigned short nbBluePawn) noexcept;
     static void availableMoves(Board* board) noexcept;
 public:
-    ConsoleView() noexcept = default;
-    virtual ~ConsoleView() noexcept = default;
+    ConsoleView() = default;
+    virtual ~ConsoleView() = default;
 
     virtual void update(Subject *subject) override;
     static const string selectPawn(const string& option, bool turn, unsigned short& row, unsigned short& column) noexcept;
+    static void printMessage(const string& message);
 };
 
 

@@ -13,9 +13,12 @@
 #include "exception/no_more_move.h"
 #include "exception/used_square.h"
 #include "exception/not_available_move.h"
+#include "exception/restart.h"
+#include "../View/Qt/QtView.h"
 #include <sstream>
 
 #define ENDGAME "Thank you for playing Ataxx, we hope to see you back soon!"
+#define TRYAGAIN " Please try again."
 
 using std::invalid_argument;
 using std::stringstream;
@@ -90,8 +93,11 @@ void MainApp::consoleMode() {
                 input = "Please select a pawn:";
                 input = ConsoleView::selectPawn(input, turn, row, column);
                 if(input == "exit"){
-                    cout << ENDGAME << endl;
+                    ConsoleView::printMessage(ENDGAME);
                     break;
+                }
+                if(input == "restart"){
+                    throw restart("consoleMode", "restart");
                 }
                 verif.str("");
                 verif.clear();
@@ -107,8 +113,11 @@ void MainApp::consoleMode() {
             input = "Select a destination from the available moves:";
             input = ConsoleView::selectPawn(input, turn, newRow, newColumn);
             if(input == "exit"){
-                cout << ENDGAME << endl;
+                ConsoleView::printMessage(ENDGAME);
                 break;
+            }
+            if(input == "restart"){
+                throw restart("consoleMode", "restart");
             }
 
             verif.str("");
@@ -122,46 +131,63 @@ void MainApp::consoleMode() {
                 board->addPawn((turn) ? Red : Blue, newRow, newColumn);
             }
             else{
-                board->movePawn(row, column, newRow, newColumn);//TODO correct this condition by using the adjacent function
+                board->movePawn(row, column, newRow, newColumn);
             }
 
             if(board->getNbRedPawn() == 0){
-                cout << "Blue Player has won!" << endl << ENDGAME << endl;
+                ConsoleView::printMessage("Blue Player has won!");
+                ConsoleView::printMessage(ENDGAME);
                 break;
             }
             else if(board->getNbBluePawn() == 0){
-                cout << "Red Player has won!" << endl << ENDGAME << endl;
+                ConsoleView::printMessage("Red Player has won!");
+                ConsoleView::printMessage(ENDGAME);
                 break;
             }
             selectOrMove = true;
             turn = !turn;
         }
         catch (invalid_input& ii){
-            cout << ii.getSpecificMessage() << " Please try again." << endl;
+            ConsoleView::printMessage(ii.getSpecificMessage() + TRYAGAIN);
         }
         catch (bad_board_coordinates& bbc){
             selectOrMove = true;
-            cout << bbc.getSpecificMessage() << " Please try again." << endl;
+            ConsoleView::printMessage(bbc.getSpecificMessage() + TRYAGAIN);
         }
         catch (bad_owner& bo){
             selectOrMove = true;
-            cout << bo.getSpecificMessage() << " Please try again." << endl;
+            ConsoleView::printMessage(bo.getSpecificMessage() + TRYAGAIN);
         }
         catch (no_more_move& nmm){
-            cout << nmm.getSpecificMessage() << " Please try again." << endl << ENDGAME << endl;
+            ConsoleView::printMessage(nmm.getSpecificMessage() + TRYAGAIN);
+            ConsoleView::printMessage(ENDGAME);
             break;
         }
         catch (used_square& us){
             selectOrMove = false;
-            cout << us.getSpecificMessage() << " Please try again." << endl;
+            ConsoleView::printMessage(us.getSpecificMessage() + TRYAGAIN);
         }
         catch (not_available_move& nam){
             selectOrMove = false;
-            cout << nam.getSpecificMessage() << " Please try again." << endl;
+            ConsoleView::printMessage(nam.getSpecificMessage() + TRYAGAIN);
+        }
+        catch (restart& r){
+            ConsoleView::printMessage("-------------------------");
+            ConsoleView::printMessage(r.getSpecificMessage());
+            ConsoleView::printMessage("-------------------------");
+            delete board;
+            board = new Board();
+            board->addObserver(view);
+            turn = true;
+            selectOrMove = true;
         }
     }
 }
 
-void MainApp::graphicMode() {}
+void MainApp::graphicMode() {
+    board = new Board();
+    shared_ptr<QtView> view (new QtView(board));
+    board->addObserver(view);
+}
 
 void MainApp::mixedMode() {}
