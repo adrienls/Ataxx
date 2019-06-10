@@ -72,5 +72,7 @@ We use [Git](https://git-scm.com/) for versioning.
 ## License
 This project is licensed under the GNU AGPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
 
+License chosed thanks to [choosealicense.com](https://choosealicense.com/)
+
 ## Acknowledgments
 This game is the final Qt project of my second year of engineering school in France.
